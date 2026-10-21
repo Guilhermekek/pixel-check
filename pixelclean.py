@@ -389,7 +389,10 @@ def thick_outline(g):
             if c is T:
                 continue
             for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)):  # (dx, dy) aponta pro lado transparente
-                if at(g, x + dx, y + dy) is T and at(g, x - dx, y - dy) == c:
+                qx, qy = x - dx, y - dy
+                # o de dentro (q) não pode encostar no lado de fora: senão é o contorno correndo num degrau, não espessura
+                inner = all(at(g, qx + ex, qy + ey) is not T for ex, ey in ((1, 0), (-1, 0), (0, 1), (0, -1)))
+                if at(g, x + dx, y + dy) is T and at(g, qx, qy) == c and inner:
                     r = at(g, x - 2 * dx, y - 2 * dy)
                     if r is not T and lum(r) > lum(c) + 30:
                         out[(x - dx, y - dy)] = r
@@ -944,8 +947,11 @@ def test():
     g = [row[:6] for row in g]
     assert jaggies(g) == {}, jaggies(g)
     # contorno 2px: borda preta dupla antes da pele
-    g = [[T, K, K, S1, S1]]
-    assert thick_outline(g) == {(2, 0): S1}, thick_outline(g)
+    g = [[T, K, K, S1, S1] for _ in range(3)]
+    assert thick_outline(g) == {(2, 1): S1}, thick_outline(g)  # só o do meio: os outros encostam fora da imagem
+    # degrau de 2px na diagonal: o contorno corre na horizontal, não é espessura
+    g = [[T, T, T, T], [T, K, K, S1], [T, T, T, K]]
+    assert thick_outline(g) == {}, thick_outline(g)
     assert thick_outline([[T, K, S1, S1, S1]]) == {}
     # banding: duas fileiras de 3, cores diferentes, alinhadas
     g = [[S1, S1, S1, K], [S2, S2, S2, K]]

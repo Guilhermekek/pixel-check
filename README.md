@@ -48,6 +48,16 @@ ficam do lado errado: ajuste à mão.
 
 Atalhos: Edit > Keyboard Shortcuts, procure o nome do script.
 
+## Corpo base (template/)
+
+`template/base_frente.aseprite`: corpo base de frente, 48x48, feito a partir do gesto de um rabisco
+(`template/rabisco_referencia.png`). Cada segmento (cabeça, peito, cintura, braço, antebraço, mão, coxa,
+canela, pé) tem a sua cor e camada; o lado esquerdo do personagem tem cores diferentes do direito, pra
+dar pra seguir cada membro ao girar ou animar. Desenhe a roupa/cabelo por cima, em camadas novas.
+
+Pra mudar a forma: edite os polígonos em `template/base.py`, rode `python template/base.py` e depois
+`Aseprite.exe -b --script template/montar_aseprite.lua`.
+
 ## Exemplos de treino (dados/)
 
 Base pra, no futuro, uma IA aprender o seu estilo. **Nada é salvo sem você clicar.**
