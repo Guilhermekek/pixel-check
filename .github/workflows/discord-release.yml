@@ -1,0 +1,30 @@
+# Avisa no Discord quando uma release nova é publicada.
+# Precisa do segredo DISCORD_WEBHOOK (Settings > Secrets and variables > Actions) com a URL do webhook do canal.
+name: Aviso no Discord
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  discord:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Mandar mensagem
+        env:
+          WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          TAG: ${{ github.event.release.tag_name }}
+          NAME: ${{ github.event.release.name }}
+          URL: ${{ github.event.release.html_url }}
+          BODY: ${{ github.event.release.body }}
+        run: |
+          if [ -z "$WEBHOOK" ]; then
+            echo "Falta o segredo DISCORD_WEBHOOK no repositório."
+            exit 1
+          fi
+          payload=$(jq -n \
+            --arg title "Nova versão do pixel-check: ${NAME:-$TAG}" \
+            --arg url "$URL" \
+            --arg desc "${BODY:0:1500}" \
+            '{embeds: [{title: $title, url: $url, description: $desc, color: 5814783}]}')
+          curl -sSf -H "Content-Type: application/json" -d "$payload" "$WEBHOOK"
