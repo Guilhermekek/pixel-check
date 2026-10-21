@@ -1,0 +1,6 @@
+# arte e dados pessoais: ficam só no seu computador
+sprites/
+debug/
+dados/
+__pycache__/
+*.pyc
